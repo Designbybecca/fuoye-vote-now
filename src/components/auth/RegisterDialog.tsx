@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Vote, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Vote, CheckCircle, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface RegisterDialogProps {
   open: boolean;
@@ -13,38 +12,14 @@ interface RegisterDialogProps {
 }
 
 const RegisterDialog = ({ open, onOpenChange }: RegisterDialogProps) => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    matricNumber: "",
-    email: "",
-    password: "",
-    confirmPassword: ""
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Password Mismatch",
-        description: "Please ensure both passwords match.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Mock registration success
-    setIsSubmitted(true);
-    toast({
-      title: "Registration Successful!",
-      description: "Please check your email to verify your account.",
+  const [formData, setFormData({
+      fullName: "",
+      matricNumber: "",
+      email: "",
+      password: "",
+      confirmPassword: ""
     });
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    onOpenChange(false);
   };
 
   if (isSubmitted) {
@@ -62,7 +37,7 @@ const RegisterDialog = ({ open, onOpenChange }: RegisterDialogProps) => {
               We've sent a verification email to <strong>{formData.email}</strong>. 
               Please click the link in the email to verify your account and complete your registration.
             </DialogDescription>
-            <Button onClick={() => onOpenChange(false)} className="w-full">
+            <Button onClick={handleClose} className="w-full">
               Close
             </Button>
           </div>
@@ -145,8 +120,19 @@ const RegisterDialog = ({ open, onOpenChange }: RegisterDialogProps) => {
             />
           </div>
           
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-            Register
+          <Button 
+            type="submit" 
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Registering...
+              </>
+            ) : (
+              'Register'
+            )}
           </Button>
         </form>
       </DialogContent>
