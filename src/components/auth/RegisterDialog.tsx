@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -12,13 +13,57 @@ interface RegisterDialogProps {
 }
 
 const RegisterDialog = ({ open, onOpenChange }: RegisterDialogProps) => {
-  const [formData, setFormData({
+  const [formData, setFormData] = useState({
+    fullName: "",
+    matricNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const { register } = useAuth();
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await register({
+        fullName: formData.fullName,
+        matricNumber: formData.matricNumber,
+        email: formData.email,
+        password: formData.password
+      });
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setFormData({
       fullName: "",
       matricNumber: "",
       email: "",
       password: "",
       confirmPassword: ""
     });
+    setIsSubmitted(false);
     onOpenChange(false);
   };
 
