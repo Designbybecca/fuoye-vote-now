@@ -78,14 +78,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const register = async (userData: any) => {
     try {
-      const response = await mockAuthService.register(userData);
+      await mockAuthService.register(userData);
       
       toast({
         title: "Registration Successful",
         description: "Please check your email to verify your account.",
       });
-      
-      return response;
     } catch (error: any) {
       console.error('Registration failed:', error);
       toast({
