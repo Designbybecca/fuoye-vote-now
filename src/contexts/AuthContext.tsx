@@ -1,10 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authAPI, User } from '@/services/api';
+import { mockAuthService, MockUser } from '@/services/mockAuth';
 import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
-  user: User | null;
+  user: MockUser | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (credentials: { matricNumber: string; password: string }) => Promise<void>;
@@ -28,7 +28,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<MockUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -40,11 +40,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const initializeAuth = async () => {
     try {
-      const token = localStorage.getItem('auth_token');
-      if (token) {
-        const userData = await authAPI.getCurrentUser();
-        setUser(userData);
-      }
+      const userData = await mockAuthService.getCurrentUser();
+      setUser(userData);
     } catch (error) {
       console.error('Auth initialization failed:', error);
       localStorage.removeItem('auth_token');
@@ -56,7 +53,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = async (credentials: { matricNumber: string; password: string }) => {
     try {
-      const response = await authAPI.login(credentials);
+      const response = await mockAuthService.login(credentials);
       
       if (response.token) {
         localStorage.setItem('auth_token', response.token);
@@ -72,7 +69,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error('Login failed:', error);
       toast({
         title: "Login Failed",
-        description: error.response?.data?.message || "Invalid credentials. Please try again.",
+        description: error.message || "Invalid credentials. Please try again.",
         variant: "destructive",
       });
       throw error;
@@ -81,7 +78,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const register = async (userData: any) => {
     try {
-      const response = await authAPI.register(userData);
+      const response = await mockAuthService.register(userData);
       
       toast({
         title: "Registration Successful",
@@ -93,7 +90,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       console.error('Registration failed:', error);
       toast({
         title: "Registration Failed",
-        description: error.response?.data?.message || "Registration failed. Please try again.",
+        description: error.message || "Registration failed. Please try again.",
         variant: "destructive",
       });
       throw error;
@@ -102,7 +99,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      await authAPI.logout();
+      await mockAuthService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -119,7 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const refreshUser = async () => {
     try {
-      const userData = await authAPI.getCurrentUser();
+      const userData = await mockAuthService.getCurrentUser();
       setUser(userData);
     } catch (error) {
       console.error('Failed to refresh user:', error);
