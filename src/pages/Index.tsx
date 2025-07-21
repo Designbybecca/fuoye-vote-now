@@ -281,7 +281,7 @@ const Index = () => {
             Empowering student democracy through secure digital voting
           </p>
           <p className="text-sm text-gray-500">
-            © 2024 Federal University Oye-Ekiti. All rights reserved.
+            © 2025 Federal University Oye-Ekiti. All rights reserved.
           </p>
         </div>
       </footer>
